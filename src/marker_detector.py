@@ -49,7 +49,7 @@ class MarkerDetector(object):
             5. Detect and decode markers
             6. Estimate marker 3D pose
         """
-        debug = 0
+        debug = 4
 
         # 1.Convert the input image to grayscale
         grayscale = self._prepare_image(frame)
@@ -81,6 +81,9 @@ class MarkerDetector(object):
 
         # 5.Detect and decode markers
         detected_markers = self._detect_markers(grayscale, possible_markers)
+
+        if debug:
+            cv2.imwrite(img=frame, filename='debug.png')
 
         if markers_only:
             return detected_markers
