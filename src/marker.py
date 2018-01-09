@@ -67,7 +67,7 @@ class Marker(object):
         # debug
         """cv2.imshow("Marker", cv2.resize(marker_image, (200,200)))"""
 
-        cell_size = marker_image.shape[0] / 7
+        cell_size = marker_image.shape[0] // 7
 
         # check for black border
         for y in range(7):
