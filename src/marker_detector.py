@@ -267,7 +267,7 @@ class MarkerDetector(object):
             T[0][3] = T[0][3] = T[0][3] = 0
             T[3][3] = 1
 
-            # Convert from OpenCV to OpenGL dimensionality.
+            # Convert from OpenCV to OpenGL axis orientations.
             cv_to_gl = np.zeros((4, 4), np.float32)
             cv_to_gl[0][0] = 1
             cv_to_gl[1][1] = -1  # Invert the y axis
