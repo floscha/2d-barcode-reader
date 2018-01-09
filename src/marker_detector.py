@@ -5,6 +5,9 @@ import numpy as np
 from marker import Marker
 
 
+DEBUG = 4
+
+
 class MarkerDetector(object):
     """A detector class to retrieve markers from an image."""
 
@@ -49,27 +52,26 @@ class MarkerDetector(object):
             5. Detect and decode markers
             6. Estimate marker 3D pose
         """
-        debug = 4
 
         # 1.Convert the input image to grayscale
         grayscale = self._prepare_image(frame)
-        if debug == 1:
+        if DEBUG == 1:
             frame[:, :] = cv2.cvtColor(grayscale, cv2.COLOR_GRAY2BGR)
 
         # 2.Perform binary threshold operation
         threshold_img = self._perform_threshold(grayscale)
-        if debug == 2:
+        if DEBUG == 2:
             frame[:, :] = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
 
         # 3.Detect contours
         # contours = self.find_contours(threshold_img, grayscale.shape[0]/5)
         contours = self._find_contours(threshold_img, 5)
-        if debug == 3:
+        if DEBUG == 3:
             cv2.drawContours(frame, contours, -1, (0, 0, 255), 2)
 
         # 4.Search for possible markers
         possible_markers = self._find_marker_candidates(contours)
-        if debug == 4:
+        if DEBUG == 4:
             color = (0, 0, 255)
             thickness = 2
             for m in possible_markers:
@@ -82,7 +84,7 @@ class MarkerDetector(object):
         # 5.Detect and decode markers
         detected_markers = self._detect_markers(grayscale, possible_markers)
 
-        if debug:
+        if DEBUG:
             cv2.imwrite(img=frame, filename='debug.png')
 
         if markers_only:
