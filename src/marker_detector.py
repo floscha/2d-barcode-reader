@@ -111,9 +111,9 @@ class MarkerDetector(object):
 
     def _find_contours(self, img, min_contour_points_allowed):
         """Find all contours within the given image."""
-        contours, hierarchy = cv2.findContours(img,
-                                               mode=cv2.RETR_LIST,
-                                               method=cv2.CHAIN_APPROX_NONE)
+        _, contours, hierarchy = cv2.findContours(img,
+                                                  mode=cv2.RETR_LIST,
+                                                  method=cv2.CHAIN_APPROX_NONE)
         return [c for c in contours if len(c) >= min_contour_points_allowed]
 
     def _find_marker_candidates(self, contours):
