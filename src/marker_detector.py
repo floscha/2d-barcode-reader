@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-from Marker import Marker
+from marker import Marker
 
 
 class MarkerDetector(object):
