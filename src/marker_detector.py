@@ -128,7 +128,9 @@ class MarkerDetector(object):
         for c in contours:
             # Approximate to polygon.
             eps = len(c) * 0.05
-            approx_curve = cv2.approxPolyDP(c, eps, True)
+            approx_curve = cv2.approxPolyDP(curve=c,
+                                            epsilon=eps,
+                                            closed=True)
             # Only consider polygons that have 4 points and are convex.
             if not len(approx_curve) == 4:
                 continue
@@ -172,10 +174,14 @@ class MarkerDetector(object):
         # Mask element with smaller perimeter.
         removal_mask = np.zeros(len(possible_markers))
         for i in range(len(too_near_candidates)):
-            p1 = cv2.arcLength(possible_markers[too_near_candidates[i][0]],
-                               True)
-            p2 = cv2.arcLength(possible_markers[too_near_candidates[i][1]],
-                               True)
+            p1 = cv2.arcLength(
+                curve=possible_markers[too_near_candidates[i][0]],
+                closed=True
+            )
+            p2 = cv2.arcLength(
+                curve=possible_markers[too_near_candidates[i][1]],
+                closed=True
+            )
             if p1 > p2:
                 removal_index = too_near_candidates[i][0]
             else:
@@ -197,8 +203,11 @@ class MarkerDetector(object):
         for marker in marker_candidates:
             # Remove perspective projection.
             h = self.m_mc_2d
-            M = cv2.getPerspectiveTransform(marker.points, h)
-            marker_image = cv2.warpPerspective(grayscale, M, self.marker_size)
+            M = cv2.getPerspectiveTransform(src=marker.points,
+                                            mapMatrix=h)
+            marker_image = cv2.warpPerspective(src=grayscale,
+                                               M=M,
+                                               dsize=self.marker_size)
 
             n_rotations = 0
             id_ = marker.get_marker_id(marker_image, n_rotations)
@@ -220,14 +229,19 @@ class MarkerDetector(object):
                     precise_corners.append(marker.points[c])
             precise_corners = np.array(precise_corners, np.float32)
 
+            # Tuple that defines the termination criteria for the cornerSubPix
+            # method. Contains the following parameters:
+            #   type (int)
+            #   maxCount (int)
+            #   epsilon (float)
             criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER,
                         30,
                         0.1)
-            cv2.cornerSubPix(grayscale,
-                             precise_corners,
-                             (5, 5),
-                             (-1, -1),
-                             criteria)
+            cv2.cornerSubPix(image=grayscale,
+                             corners=precise_corners,
+                             winSize=(5, 5),
+                             zeroZone=(-1, -1),
+                             criteria=criteria)
 
             # Copy back.
             for i in range(len(good_markers)):
@@ -244,10 +258,10 @@ class MarkerDetector(object):
             # m.points[1][1]
             # uad_3d = np.float32([[x0, y0, 0], [x1, y0, 0], [x1, y1, 0],
             # [x0, y1, 0]])
-            ret, rvec, tvec = cv2.solvePnP(self.m_mc_3d,
-                                           m.points,
-                                           self.cam_matrix,
-                                           self.dist_coeff)
+            ret, rvec, tvec = cv2.solvePnP(objectPoints=self.m_mc_3d,
+                                           imagePoints=m.points,
+                                           cameraMatrix=self.cam_matrix,
+                                           distCoeffs=self.dist_coeff)
 
             R = cv2.Rodrigues(rvec)[0]
             # R = np.linalg.inv(R) #R.T rotation of inverse
