@@ -121,7 +121,7 @@ class MarkerDetector(object):
                                                   method=cv2.CHAIN_APPROX_NONE)
         return [c for c in contours if len(c) >= min_contour_points_allowed]
 
-    def _find_marker_candidates(self, contours):
+    def _find_marker_candidates(self, contours, max_squared_distance=100):
         """Search for possible markers amongst a number of contours."""
         # For each contour: decide if it's a possible marker.
         possible_markers = []
@@ -160,13 +160,13 @@ class MarkerDetector(object):
             m1 = possible_markers[i]
             for j in range(i+1, len(possible_markers)):
                 m2 = possible_markers[j]
-                dist_squared = 0
+                squared_distance = 0
                 for c in range(4):
                     v = m1[c] - m2[c]
-                    dist_squared += np.dot(v, v)
-                dist_squared /= 4
+                    squared_distance += np.dot(v, v)
+                squared_distance /= 4
 
-                if dist_squared < 100:
+                if squared_distance < max_squared_distance:
                     too_near_candidates.append((i, j))
 
         # Mask element with smaller perimeter.
