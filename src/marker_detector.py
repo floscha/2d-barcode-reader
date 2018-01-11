@@ -211,7 +211,7 @@ class MarkerDetector(object):
             # Remove perspective projection.
             h = self.m_mc_2d
             M = cv2.getPerspectiveTransform(src=marker.points,
-                                            mapMatrix=h)
+                                            dst=h)
             marker_image = cv2.warpPerspective(src=grayscale,
                                                M=M,
                                                dsize=self.marker_size)
