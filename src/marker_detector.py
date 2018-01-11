@@ -11,10 +11,13 @@ DEBUG = 4
 class MarkerDetector(object):
     """A detector class to retrieve markers from an image."""
 
-    def __init__(self, calibration=None):
+    def __init__(self,
+                 marker_size=(100, 100),
+                 min_contour_length_allowed=100,
+                 calibration=None):
         """Initialize a new MarkerDetector object."""
-        self.min_contour_length_allowed = 100
-        self.marker_size = (100, 100)
+        self.marker_size = marker_size
+        self.min_contour_length_allowed = min_contour_length_allowed
 
         if calibration:
             self.cam_matrix = calibration.m_intrinsic
@@ -70,7 +73,11 @@ class MarkerDetector(object):
             cv2.drawContours(frame, contours, -1, (0, 0, 255), 2)
 
         # 4.Search for possible markers
-        possible_markers = self._find_marker_candidates(contours)
+        possible_markers = self._find_marker_candidates(
+            contours,
+            # TODO: Make max_squared_distance dependant on other hyperparams?
+            max_squared_distance=100
+        )
         if DEBUG == 4:
             color = (0, 0, 255)
             thickness = 2
