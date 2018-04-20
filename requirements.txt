@@ -1,0 +1,2 @@
+#cv2. Installation through pip does not work. Use e.g. APT for Ubuntu instead.
+numpy
