@@ -165,13 +165,11 @@ class MarkerDetector(object):
 
         # Mask elements with corners too close to each other.
         too_near_candidates = []
-        for i in range(len(possible_markers)):
-            m1 = possible_markers[i]
-            for j in range(i+1, len(possible_markers)):
-                m2 = possible_markers[j]
+        for i, marker_1 in enumerate(possible_markers):
+            for j, marker_2 in enumerate(possible_markers[i+1:]):
                 squared_distance = 0
                 for c in range(4):
-                    v = m1[c] - m2[c]
+                    v = marker_1[c] - marker_2[c]
                     squared_distance += np.dot(v, v)
                 squared_distance /= 4
 
@@ -180,26 +178,26 @@ class MarkerDetector(object):
 
         # Mask element with smaller perimeter.
         removal_mask = np.zeros(len(possible_markers))
-        for i in range(len(too_near_candidates)):
+        for candidate in too_near_candidates:
             p1 = cv2.arcLength(
-                curve=possible_markers[too_near_candidates[i][0]],
+                curve=possible_markers[candidate[0]],
                 closed=True
             )
             p2 = cv2.arcLength(
-                curve=possible_markers[too_near_candidates[i][1]],
+                curve=possible_markers[candidate[1]],
                 closed=True
             )
             if p1 > p2:
-                removal_index = too_near_candidates[i][0]
+                removal_index = candidate[0]
             else:
-                removal_index = too_near_candidates[i][1]
+                removal_index = candidate[1]
             removal_mask[removal_index] = 1
 
         # Return only unmasked elements.
         detected_markers = []
-        for i in range(len(possible_markers)):
+        for marker in possible_markers:
             if not removal_mask[i]:
-                detected_markers.append(Marker(possible_markers[i]))
+                detected_markers.append(Marker(marker))
 
         return detected_markers
 
@@ -230,8 +228,8 @@ class MarkerDetector(object):
         # Refine marker corners using sub pixel accuracy.
         if good_markers:
             precise_corners = []
-            for i in range(len(good_markers)):
-                marker = good_markers[i]
+            for marker in good_markers:
+                # FIXME Use extend() instead of append() in loop?
                 for c in range(4):
                     precise_corners.append(marker.points[c])
             precise_corners = np.array(precise_corners, np.float32)
@@ -251,8 +249,7 @@ class MarkerDetector(object):
                              criteria=criteria)
 
             # Copy back.
-            for i in range(len(good_markers)):
-                marker = good_markers[i]
+            for i, marker in enumerate(good_markers):
                 for c in range(4):
                     marker.points[c] = precise_corners[i * 4 + c]
 
