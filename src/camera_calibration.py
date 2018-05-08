@@ -20,7 +20,8 @@ class CameraCalibration(object):
             print(self.m_distorsion)
             print("==========================================================")
 
-    def matrix_from_file(self, fname):
+    @staticmethod
+    def matrix_from_file(fname):
         """Read a NumPy matrix from a text file."""
         with open(fname) as f:
             cont = f.readlines()

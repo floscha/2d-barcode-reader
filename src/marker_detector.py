@@ -103,11 +103,13 @@ class MarkerDetector(object):
 
         return self._estimate_position(detected_markers)
 
-    def _prepare_image(self, img):
+    @staticmethod
+    def _prepare_image(img):
         """Convert the given image to grayscale."""
         return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    def _perform_threshold(self, img):
+    @staticmethod
+    def _perform_threshold(img):
         """Perform binary threshold operation on the given image."""
         img = cv2.GaussianBlur(img,
                                ksize=(5, 5),
@@ -121,7 +123,8 @@ class MarkerDetector(object):
             C=7
         )
 
-    def _find_contours(self, img, min_contour_points_allowed):
+    @staticmethod
+    def _find_contours(img, min_contour_points_allowed):
         """Find all contours within the given image."""
         _, contours, hierarchy = cv2.findContours(img,
                                                   mode=cv2.RETR_LIST,

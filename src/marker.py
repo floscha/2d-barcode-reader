@@ -14,7 +14,8 @@ class Marker(object):
         self.t = None
         self.transformation = None
 
-    def rotate(self, im):
+    @staticmethod
+    def rotate(im):
         """Rotate the given image for 90 degrees."""
         out = im.copy()
         for i in range(im.shape[0]):
@@ -22,7 +23,8 @@ class Marker(object):
                 out[i, j] = im[im.shape[1]-j-1, i]
         return out
 
-    def hamm_dist_marker(self, bits):
+    @staticmethod
+    def hamm_dist_marker(bits):
         ids = [[1, 0, 0, 0, 0],
                [1, 0, 1, 1, 1],
                [0, 1, 0, 0, 1],
@@ -46,7 +48,8 @@ class Marker(object):
 
         return dist
 
-    def mat2id(self, bits):
+    @staticmethod
+    def mat2id(bits):
         val = 0
         for y in range(5):
             val <<= 1
