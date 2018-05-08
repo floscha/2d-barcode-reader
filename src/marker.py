@@ -31,18 +31,18 @@ class Marker(object):
         dist = 0
 
         for y in range(5):
-            minSum = 1e5  # hamming distance to each possible word
+            min_sum = 1e5  # hamming distance to each possible word
 
             for p in range(4):
-                sum = 0
+                sum_ = 0
                 for x in range(5):
-                    sum += bits[y, x] == 0 if ids[p][x] else 1
+                    sum_ += bits[y, x] == 0 if ids[p][x] else 1
 
-                if minSum > sum:
-                    minSum = sum
+                if min_sum > sum_:
+                    min_sum = sum_
 
             #do the and
-            dist += minSum
+            dist += min_sum
 
         return dist
 
