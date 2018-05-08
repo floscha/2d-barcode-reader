@@ -62,13 +62,13 @@ class Marker(object):
         return val
 
     def get_marker_id(self, marker_image, n_rotations):
-        ret, th = cv2.threshold(marker_image,
-                                thresh=0,
-                                maxval=255,
-                                type=cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, th = cv2.threshold(marker_image,
+                              thresh=0,
+                              maxval=255,
+                              type=cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
         # debug
-        """cv2.imshow("Marker", cv2.resize(marker_image, (200,200)))"""
+        # cv2.imshow("Marker", cv2.resize(marker_image, (200,200)))
 
         cell_size = marker_image.shape[0] // 7
 

@@ -126,9 +126,9 @@ class MarkerDetector(object):
     @staticmethod
     def _find_contours(img, min_contour_points_allowed):
         """Find all contours within the given image."""
-        _, contours, hierarchy = cv2.findContours(img,
-                                                  mode=cv2.RETR_LIST,
-                                                  method=cv2.CHAIN_APPROX_NONE)
+        _, contours, _ = cv2.findContours(img,
+                                          mode=cv2.RETR_LIST,
+                                          method=cv2.CHAIN_APPROX_NONE)
         return [c for c in contours if len(c) >= min_contour_points_allowed]
 
     def _find_marker_candidates(self, contours, max_squared_distance=100):
@@ -210,15 +210,15 @@ class MarkerDetector(object):
 
         for marker in marker_candidates:
             # Remove perspective projection.
-            h = self.m_mc_2d
-            M = cv2.getPerspectiveTransform(src=marker.points,
-                                            dst=h)
-            marker_image = cv2.warpPerspective(src=grayscale,
-                                               M=M,
-                                               dsize=self.marker_size)
+            # h = self.m_mc_2d
+            # M = cv2.getPerspectiveTransform(src=marker.points,
+            #                                 dst=h)
+            # marker_image = cv2.warpPerspective(src=grayscale,
+            #                                    M=M,
+            #                                    dsize=self.marker_size)
 
             n_rotations = 0
-            id_ = marker.get_marker_id(marker_image, n_rotations)
+            # id_ = marker.get_marker_id(marker_image, n_rotations)
             if True:  # id:
                 # marker.id = id
                 # Sort the points so that they are always in the same order
@@ -265,10 +265,10 @@ class MarkerDetector(object):
             # m.points[1][1]
             # uad_3d = np.float32([[x0, y0, 0], [x1, y0, 0], [x1, y1, 0],
             # [x0, y1, 0]])
-            ret, rvec, tvec = cv2.solvePnP(objectPoints=self.m_mc_3d,
-                                           imagePoints=m.points,
-                                           cameraMatrix=self.cam_matrix,
-                                           distCoeffs=self.dist_coeff)
+            _, rvec, tvec = cv2.solvePnP(objectPoints=self.m_mc_3d,
+                                         imagePoints=m.points,
+                                         cameraMatrix=self.cam_matrix,
+                                         distCoeffs=self.dist_coeff)
 
             R = cv2.Rodrigues(rvec)[0]
             # R = np.linalg.inv(R) #R.T rotation of inverse
@@ -296,7 +296,7 @@ class MarkerDetector(object):
             cv_to_gl[3][3] = 1
             # T = cv_to_gl * T
 
-
-            # solvePnP does camera to marker pose; invert to get marker pose to the camera
-            transformation = np.linalg.inv(T)
+            # solvePnP does camera to marker pose
+            # invert to get marker pose to the camera
+            # transformation = np.linalg.inv(T)
             return T
