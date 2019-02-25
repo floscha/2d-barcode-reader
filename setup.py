@@ -9,7 +9,7 @@ setup(
     author='Florian Schäfer',
     author_email='florian.joh.schaefer@gmail.com',
     license='MIT',
-    packages=['barcode_reader'],
+    packages=['barcode-reader'],
     install_requires=[
         'numpy',
         'opencv-python'
