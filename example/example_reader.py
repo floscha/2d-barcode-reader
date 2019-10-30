@@ -15,7 +15,7 @@ if __name__ == '__main__':
         raise ValueError("Image could not be read")
 
     detector = MarkerDetector(min_contour_length_allowed=10000)
-    detected_markers = detector.process_frame(frame, markers_only=True)
+    detected_markers = detector.process_frame(frame)
 
     print("%d markers detected:" % len(detected_markers))
     for marker in detected_markers:
