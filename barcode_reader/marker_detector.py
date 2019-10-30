@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-from marker import Marker
+from .marker import Marker
 
 
 DEBUG = 4
