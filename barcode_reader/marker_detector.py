@@ -19,31 +19,6 @@ class MarkerDetector(object):
         self.marker_size = marker_size
         self.min_contour_length_allowed = min_contour_length_allowed
 
-        if calibration:
-            self.cam_matrix = calibration.m_intrinsic
-            self.dist_coeff = calibration.m_distorsion
-        else:
-            print("Warning: No calibration given. " +
-                  "Pose estimation unavailable.")
-            self.cam_matrix = None
-            self.dist_coeff = None
-
-        # Define marker corners.
-        self.m_mc_3d = np.array([[-0.5, -0.5, 0],
-                                 [0.5,  -0.5, 0],
-                                 [0.5,   0.5, 0],
-                                 [-0.5,  0.5, 0]],
-                                dtype=np.float32)
-        self.m_mc_3d *= 5  # Why?!
-
-        self.m_mc_2d = np.array(
-            [[0,                       0],
-             [self.marker_size[0] - 1, 0],
-             [self.marker_size[0] - 1, self.marker_size[1] - 1],
-             [0,                       self.marker_size[1] - 1]],
-            dtype=np.float32
-        )
-
     def process_frame(self, frame, markers_only=False):
         """Estimate the 3D pose for a frame using marker detection.
 
@@ -67,7 +42,6 @@ class MarkerDetector(object):
             frame[:, :] = cv2.cvtColor(threshold_img, cv2.COLOR_GRAY2BGR)
 
         # 3.Detect contours
-        # contours = self.find_contours(threshold_img, grayscale.shape[0]/5)
         contours = self._find_contours(threshold_img, 5)
         if DEBUG == 3:
             cv2.drawContours(frame, contours, -1, (0, 0, 255), 2)
@@ -94,14 +68,7 @@ class MarkerDetector(object):
         if DEBUG:
             cv2.imwrite(img=frame, filename='debug.png')
 
-        if markers_only:
-            return detected_markers
-
-        # 6.Estimate marker 3D pose
-        if not self.cam_matrix or not self.dist_coeff:
-            raise ValueError("No camera calibration data available.")
-
-        return self._estimate_position(detected_markers)
+        return detected_markers
 
     @staticmethod
     def _prepare_image(img):
@@ -209,18 +176,9 @@ class MarkerDetector(object):
         good_markers = []
 
         for marker in marker_candidates:
-            # Remove perspective projection.
-            # h = self.m_mc_2d
-            # M = cv2.getPerspectiveTransform(src=marker.points,
-            #                                 dst=h)
-            # marker_image = cv2.warpPerspective(src=grayscale,
-            #                                    M=M,
-            #                                    dsize=self.marker_size)
 
             n_rotations = 0
-            # id_ = marker.get_marker_id(marker_image, n_rotations)
             if True:  # id:
-                # marker.id = id
                 # Sort the points so that they are always in the same order
                 # no matter the camera orientation.
                 rot = (4 - n_rotations) % 4
@@ -257,46 +215,3 @@ class MarkerDetector(object):
                     marker.points[c] = precise_corners[i * 4 + c]
 
         return good_markers
-
-    def _estimate_position(self, detected_markers):
-        """Estimate a 3D pose based on the detected markers."""
-        for m in detected_markers:
-            # x0, y0, x1, y1 = m.points[3][0], m.points[3][1], m.points[1][0],
-            # m.points[1][1]
-            # uad_3d = np.float32([[x0, y0, 0], [x1, y0, 0], [x1, y1, 0],
-            # [x0, y1, 0]])
-            _, rvec, tvec = cv2.solvePnP(objectPoints=self.m_mc_3d,
-                                         imagePoints=m.points,
-                                         cameraMatrix=self.cam_matrix,
-                                         distCoeffs=self.dist_coeff)
-
-            R = cv2.Rodrigues(rvec)[0]
-            # R = np.linalg.inv(R) #R.T rotation of inverse
-            # tvec = -R * tvec # translation of inverse
-
-            T = np.empty((4, ascii4), np.float32)
-            # copy to transformation matrix
-            for row in range(3):
-                for col in range(3):
-                    # copy rotation component
-                    T[row][col] = R[row][col]
-                # copy translation component
-                T[col][3] = tvec[row]
-
-            # Make matrix T homogeneous.
-            # FIXME Use different x indices?! Also use NumPy op instead.
-            T[0][3] = T[0][3] = T[0][3] = 0
-            T[3][3] = 1
-
-            # Convert from OpenCV to OpenGL axis orientations.
-            cv_to_gl = np.zeros((4, 4), np.float32)
-            cv_to_gl[0][0] = 1
-            cv_to_gl[1][1] = -1  # Invert the y axis
-            cv_to_gl[2][2] = -1  # invert the z axis
-            cv_to_gl[3][3] = 1
-            # T = cv_to_gl * T
-
-            # solvePnP does camera to marker pose
-            # invert to get marker pose to the camera
-            # transformation = np.linalg.inv(T)
-            return T
