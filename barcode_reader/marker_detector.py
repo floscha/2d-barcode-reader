@@ -19,7 +19,7 @@ class MarkerDetector(object):
         self.marker_size = marker_size
         self.min_contour_length_allowed = min_contour_length_allowed
 
-    def process_frame(self, frame, markers_only=False):
+    def process_frame(self, frame):
         """Estimate the 3D pose for a frame using marker detection.
 
         It thereby uses the following 6 steps:
