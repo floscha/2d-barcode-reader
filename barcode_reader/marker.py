@@ -61,7 +61,7 @@ class Marker(object):
 
         return val
 
-    def get_marker_id(self, marker_image, n_rotations):
+    def get_marker_id(self, marker_image):
         _, th = cv2.threshold(marker_image,
                               thresh=0,
                               maxval=255,
@@ -116,6 +116,5 @@ class Marker(object):
                 min_dist[0] = distances[i]
                 min_dist[1] = i
 
-        n_rotations = min_dist[1]
         if min_dist[0] == 0:
             return self.mat2id(rotations[min_dist[1]])

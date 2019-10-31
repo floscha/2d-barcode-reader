@@ -19,5 +19,4 @@ if __name__ == '__main__':
 
     print("%d markers detected:" % len(detected_markers))
     for marker in detected_markers:
-        current_marker_id = marker.get
-        print(current_marker_id)
+        print(marker.points)
