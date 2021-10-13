@@ -11,8 +11,8 @@ setup(
     license='MIT',
     packages=['barcode_reader'],
     install_requires=[
-        'numpy==1.17.3',
-        'opencv-python==3.4.7.28'
+        'numpy==1.21.2',
+        'opencv-python==4.5.3.56'
     ],
     zip_safe=False
 )
