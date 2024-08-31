@@ -12,7 +12,7 @@ setup(
     packages=['barcode_reader'],
     install_requires=[
         'numpy==1.21.2',
-        'opencv-python==4.5.3.56'
+        'opencv-python==4.8.1.78'
     ],
     zip_safe=False
 )
